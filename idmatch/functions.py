@@ -232,7 +232,7 @@ def import_img(image1, image2, res_input, res_plots, gl_extent, val_pts_option):
     geot_img2 = img2.GetGeoTransform()
     img1_proj = img1.GetProjection()
 
-    ## Find the common area between both images
+    ## Find the common area between both images"
     ext_img1 = [geot_img1[0], geot_img1[3], geot_img1[0] + (geot_img1[1] * img1.RasterXSize), geot_img1[3] + (geot_img1[5] * img1.RasterYSize)]
     ext_img2 = [geot_img2[0], geot_img2[3], geot_img2[0] + (geot_img2[1] * img2.RasterXSize), geot_img2[3] + (geot_img2[5] * img2.RasterYSize)]
     intersection = [max(ext_img1[0], ext_img2[0]), min(ext_img1[1], ext_img2[1]), min(ext_img1[2], ext_img2[2]), max(ext_img1[3], ext_img2[3])]
@@ -251,8 +251,8 @@ def import_img(image1, image2, res_input, res_plots, gl_extent, val_pts_option):
     os.system(gdalwarp_str_img2)
 
     # Re-import images and store them in greyscale
-    new_image1 = skimage.data.load(os.path.abspath(res_input + '\\i1.tif'))
-    new_image2 = skimage.data.load(os.path.abspath(res_input + '\\i2.tif'))
+    new_image1 = io.imread(os.path.abspath(res_input + '\\i1.tif'))
+    new_image2 = io.imread(os.path.abspath(res_input + '\\i2.tif'))
     new_img_geotransf = (intersection[0], cellsize, 0.0, intersection[1], 0.0, -cellsize)
     rows, cols = new_image1.shape[:2]  # new_image1 and new_image2 have the same shape
 
@@ -456,8 +456,8 @@ def import_dsm(dsm1, dsm2, res_input, res_plots, gl_extent, val_pts_option):
     ## Re-import DSMs
     new_dsm1 = gdal.Open(res_input + '\\D1.tif', gdalconst.GA_ReadOnly)
     new_dsm2 = gdal.Open(res_input + '\\D2.tif', gdalconst.GA_ReadOnly)
-    new_dsm1_arr = new_dsm1.ReadAsArray().astype(np.float)
-    new_dsm2_arr = new_dsm2.ReadAsArray().astype(np.float)
+    new_dsm1_arr = new_dsm1.ReadAsArray() #.astype(\\)
+    new_dsm2_arr = new_dsm2.ReadAsArray() #.astype(\\)
     rows, cols = new_dsm1_arr.shape[:2]  # new_dsm1_arr and new_dsm2_arr have the same shape
 
     # Get information of the new DSMs
@@ -650,8 +650,8 @@ def import_datasets(image1, image2, dsm1, dsm2, res_input, res_plots, gl_extent,
     # Re-import DSMs
     new_dsm1 = gdal.Open(res_input + '\\D1.tif', gdalconst.GA_ReadOnly)
     new_dsm2 = gdal.Open(res_input + '\\D2.tif', gdalconst.GA_ReadOnly)
-    new_dsm1_arr = new_dsm1.ReadAsArray().astype(np.float)
-    new_dsm2_arr = new_dsm2.ReadAsArray().astype(np.float)
+    new_dsm1_arr = new_dsm1.ReadAsArray().astype(float)
+    new_dsm2_arr = new_dsm2.ReadAsArray().astype(float)
 
     rows, cols = new_image1.shape[:2]  # new_image1 and new_image2, new_dsm1 and new_dsm2 have the same shape
     dataset_information = (intersection[0], cellsize, intersection[1], -cellsize, rows, cols, img1_proj)  # xOrigin, pixelWidth, yOrigin, pixelHeight, rows, cols, proj
@@ -832,8 +832,8 @@ def prefilter_img(image_filter_list, res_input, mask_data):
                 count = count + counter[0]
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")  # to ignore: UserWarning: Possible precision loss when converting from float64 to uint16
-                    image = skimage.filters.median(image, selem=None, out=None, mask=mask_data, shift_x=False, shift_y=False)
-                    image[np.where(mask_data == 0)] = 255  # skimage.filters.median filter returns a black (0) background. Reconvert in white (255). It saves the image with the mask shape in both options
+                    image = skimage.filters.rank.median(image, footprint=None, out=None, mask=mask_data, shift_x=False, shift_y=False)
+                    image[np.where(mask_data == 0)] = 255  # skimage.filters.rank.median filter returns a black (0) background. Reconvert in white (255). It saves the image with the mask shape in both options
             if 'F2' in element:
                 count = count + counter[1]
                 image = skimage.exposure.equalize_hist(image, nbins=256, mask=mask_data)  # alternative: image = cv2.equalizeHist(image)
@@ -967,7 +967,7 @@ def prefilter_hil(hil_filter_list, res_input, mask_data):
                 count = count + counter[0]
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")  # to ignore: UserWarning: Possible precision loss when converting from float64 to uint16
-                    hill = skimage.filters.median(hill, selem=None, out=None, mask=mask_data, shift_x=False, shift_y=False)
+                    hill = skimage.filters.rank.median(hill, footprint=None, out=None, mask=mask_data, shift_x=False, shift_y=False)
             if 'F5' in element:
                 count = count + counter[1]
                 hill = skimage.filters.sobel(hill, mask=mask_data)  # alternative: skimage.feature.canny
@@ -1077,8 +1077,8 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
             # Open image pair
             img1 = gdal.Open(f1, gdalconst.GA_ReadOnly)
             img2 = gdal.Open(f2, gdalconst.GA_ReadOnly)
-            img1_array = img1.ReadAsArray().astype(np.float)
-            img2_array = img2.ReadAsArray().astype(np.float)
+            img1_array = img1.ReadAsArray().astype(float)
+            img2_array = img2.ReadAsArray().astype(float)
             img1_array = img1_array
             img2_array = img2_array
 
@@ -1156,7 +1156,7 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
                         result = np.zeros((proc_size, proc_size))
 
                     # Cropping results not affected by edges
-                    result_nopad = result[np.int((proc_size/2)-pad): np.int((proc_size/2)+(pad+1)), np.int((proc_size/2)-pad): np.int((proc_size/2)+(pad+1))]
+                    result_nopad = result[int((proc_size/2)-pad): int((proc_size/2)+(pad+1)), int((proc_size/2)-pad): int((proc_size/2)+(pad+1))]
 
                     # It can be that there are inf and -inf. These points are set to 0
                     id_inf_p = np.where(np.isposinf(result_nopad))
@@ -1304,8 +1304,8 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
             # Open image pair
             img1 = gdal.Open(f1, gdalconst.GA_ReadOnly)
             img2 = gdal.Open(f2, gdalconst.GA_ReadOnly)
-            img1_array = img1.ReadAsArray().astype(np.float)
-            img2_array = img2.ReadAsArray().astype(np.float)
+            img1_array = img1.ReadAsArray().astype(float)
+            img2_array = img2.ReadAsArray().astype(float)
             img1_array = img1_array / 255
             img2_array = img2_array / 255
 
@@ -1357,7 +1357,7 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
                     result = np.real(np.fft.ifft2(fft_template * fft_search))
 
                     # Cropping results not affected by edges
-                    result_nopad = result[np.int((proc_size / 2) - pad): np.int((proc_size / 2) + (pad + 1)), np.int((proc_size / 2) - pad): np.int((proc_size / 2) + (pad + 1))]
+                    result_nopad = result[int((proc_size / 2) - pad): int((proc_size / 2) + (pad + 1)), int((proc_size / 2) - pad): int((proc_size / 2) + (pad + 1))]
                     x_res = np.array(range(-int(len(result_nopad) / 2), int(len(result_nopad) / 2) + 1))
                     y_res = range(-int(len(result_nopad) / 2), int(len(result_nopad) / 2) + 1)
 
@@ -2024,7 +2024,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
             match_angle = np.empty(len(val_magn))
 
             # Correct validation pixel coordinates (point 'p') based on padding
-            v_py1 = np.asarray(val_py1, np.int) + win_val_size; v_px1 = np.asarray(val_px1, np.int) + win_val_size
+            v_py1 = np.asarray(val_py1, int) + win_val_size; v_px1 = np.asarray(val_px1, int) + win_val_size
 
             for j in range(0, len(val_px1)):
 

@@ -5,8 +5,16 @@
 ###
 
 ## Import functions and parameter files
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))) #to load correctly idmatch
+print(sys.path)
 from idmatch import functions
 from idmatch import params
+
+import importlib
+importlib.reload(params) #load again params to have the new params
+importlib.reload(functions)
 import shutil
 
 ## Create temporary file:
