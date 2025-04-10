@@ -1,2 +1,13 @@
 nose
 sphinx
+
+#core
+#oggm
+
+#functions
+matplotlib
+scikit-image
+opencv-python
+
+#To install gdal, you should use conda, with pip it's much more difficult
+gdal 

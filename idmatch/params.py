@@ -28,7 +28,7 @@ Image2 = "C:\\Users\\moeag\\Documents\\IDMatch\\20160913_Gries_img_1m.tif"# Path
 # F1: Median filter
 # F2: Local histogram equalization
 # F3: Contrast Limited Adaptive Histogram Equalization (CLAHE).
-img_filter_list = ['F1', 'F2', 'F3', 'F1F2', 'F1F3']
+img_filter_list = ['F1']#['F1', 'F2', 'F3', 'F1F2', 'F1F3']
 
 
 #------------ MODE 2 ------------------
@@ -58,7 +58,7 @@ hil_filter_list = ['F1', 'F5', 'F1F5']
 # M1: Normalized Cross Correlation (NCC)
 # M2: Orientation Correlation (OC)
 # M3: Feature matching with SURF and Brute Force Matcher
-method_list = ['M1', 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
+method_list = ['M1'] #['M1', 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
 
 pixel_dev = 6  # integer, estimated deviation or velocity (in pixel) between the input data pair. It will be used to define the window sizes in the matching function (matching)
 step_points = 25  # integer, in pixels

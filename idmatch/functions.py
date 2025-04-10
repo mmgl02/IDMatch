@@ -1041,6 +1041,8 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
     pv, pu = np.meshgrid(np.arange(0, rows, step_grid), np.arange(0, cols, step_grid), indexing='ij')  # pv=rows, pu=cols
     pv_1D = pv.flatten()
     pu_1D = pu.flatten()
+    #print('pv', pv)
+    #print('pv_1D', pv_1D)
 
     # Only select points within the mask
     pv_m = []; pu_m = []
@@ -1534,9 +1536,9 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
 
                     # Create SURF object and find keypoints and descriptors
                     hess_thres = 300  # Hessian Threshold (best between 300 and 500). The largest the values, the fewer the kp/des
-                    surf1 = cv2.xfeatures2d.SURF_create(hess_thres, upright=0, extended=1)
+                    surf1 = cv2.SIFT_create( nfeatures=0, nOctaveLayers=4, contrastThreshold=0.005, edgeThreshold=10,  sigma=1.6) #we could change the values od the parameters. we set them as in D.Lowe paper. https://docs.opencv.org/3.4/d7/d60/classcv_1_1SIFT.html
                     kp1, des1 = surf1.detectAndCompute(template, None)
-                    surf2 = cv2.xfeatures2d.SURF_create(hess_thres, upright=0, extended=1)
+                    surf2 = cv2.SIFT_create(nfeatures=0, nOctaveLayers=4, contrastThreshold=0.005, edgeThreshold=10,  sigma=1.6)
                     kp2, des2 = surf2.detectAndCompute(search_win, None)
 
                     # Match descriptor vectors using Brute Force
@@ -1748,7 +1750,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
 
                 # Correct y1 and x1 pixel coordinates (point 'p') based on padding
                 py, px = y1[i] + hwind_size, x1[i] + hwind_size
-                point_nokeep[y1[i], x1[i]] = np.nansum([point_nokeep[y1[i], x1[i]], 0])
+                point_nokeep[y1[i], x1[i]] = np.nansum([point_nokeep[y1[i], x1[i]], 0]) #0 in point_nokeep: point we keep
 
                 win_vx = vx_pad[py-hwind_size:py+(hwind_size+1), px-hwind_size:px+(hwind_size+1)]  # +1 to put the point 'p' in the center
                 win_vy = vy_pad[py-hwind_size:py+(hwind_size+1), px-hwind_size:px+(hwind_size+1)]
@@ -1856,7 +1858,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                     # end of magnitude, directional and SNR filters
 
                 else:  # if the nbr_win_members < min_win_members:
-                    point_nokeep[y1[i], x1[i]] = np.nansum([point_nokeep[y1[i], x1[i]], 8])  # the points that do not have enough members are filtered out
+                    point_nokeep[y1[i], x1[i]] = np.nansum([point_nokeep[y1[i], x1[i]], 8])# the points that do not have enough members are filtered out
                     filt_memb = filt_memb + 1
 
                 # end loop of the window_members
@@ -1877,19 +1879,20 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
         id_good2D = np.where(point_nokeep == 0)  # index of the points that are kept, in (row, col)
 
         # Check if all points are filtered with the filters above
-        if np.nansum(id_good2D) == 0:
+        if np.nansum(id_good2D) == 0: #if all points were filtered
             magnitude_filt = magnitude_filt
             angle_filt = angle_filt
             pts_filtered = point_nokeep[y1, x1].flatten()
             id_good = []
             # magn_mean, magn_std, win_angle_mean, win_angle_std = np.nan, np.nan, np.nan, np.nan
+            filt_patch=0
         else:
 
             ## Filter point threshold
             tot_pts_percent = 0.15  # !!!advanced_param: if the percentage of left points after all above filtering process is below tot_pts_percent, it means that the datasets are probably not good and the remaining points neither.
             filt_patch = 0
             if len(id_good2D[0]) < tot_pts_percent * len(tot_match_pts[0]):
-                point_nokeep[id_good2D] = np.nansum([point_nokeep[id_good2D], 32])
+                point_nokeep[id_good2D] = np.nansum(point_nokeep[id_good2D]) +32
                 magnitude_filt = magnitude_filt
                 angle_filt = angle_filt
                 pts_filtered = point_nokeep[y1, x1].flatten()
@@ -1926,6 +1929,8 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
         pts_filtered = point_nokeep[y1, x1].flatten()
         id_good = np.where(pts_filtered == 0)  # indices in 1D
         id_good2D = np.where(point_nokeep == 0)  # indices in 2D
+        print(id_good)
+        print(id_good2D)
 
         magnitude_filt[id_good] = magn[id_good]  # magnitude array (from matching) filtered
         angle_filt[id_good] = angle[id_good]  # angle array (from matching) filtered
@@ -3201,108 +3206,113 @@ def display_results(res_postfilt, res_plots, table_mean_results, data_info, tabl
     if len(list_win_size) == 5:
         # For M1
         M1_list = [x for x in table_names2 if 'M1' in x]
-        new_l1 = [y for y in M1_list if list_win_size[0] in y]  # for each window_size, it selects all filter combinations
-        new_l2 = [y for y in M1_list if list_win_size[1] in y]
-        new_l3 = [y for y in M1_list if list_win_size[2] in y]
-        new_l4 = [y for y in M1_list if list_win_size[3] in y]
-        new_l5 = [y for y in M1_list if list_win_size[4] in y]
-        new_l1.sort(); new_l2.sort(); new_l3.sort(); new_l4.sort(); new_l5.sort();
+        if M1_list:
+            new_l1 = [y for y in M1_list if list_win_size[0] in y]  # for each window_size, it selects all filter combinations
+            new_l2 = [y for y in M1_list if list_win_size[1] in y]
+            new_l3 = [y for y in M1_list if list_win_size[2] in y]
+            new_l4 = [y for y in M1_list if list_win_size[3] in y]
+            new_l5 = [y for y in M1_list if list_win_size[4] in y]
+            new_l1.sort(); new_l2.sort(); new_l3.sort(); new_l4.sort(); new_l5.sort();
 
-        tpl1 = find_matching_index(new_l1, table_names2)
-        idx1 = [x[0] for x in tpl1]
+            tpl1 = find_matching_index(new_l1, table_names2)
+            idx1 = [x[0] for x in tpl1]
 
-        all_names_M1 = [""] + new_l1 + [""] + new_l2 + [""] + new_l3 + [""] + new_l4 + [""] + new_l5
-        idx = np.array(idx1)
-        tot_bars_M1 = np.empty(0)
-        i=0
-        while i < 5:
-            new_b = percents[idx]
-            tot_bars_M1 = hstack((tot_bars_M1, 0, new_b))
-            idx = idx + 1
-            i=i+1
+            all_names_M1 = [""] + new_l1 + [""] + new_l2 + [""] + new_l3 + [""] + new_l4 + [""] + new_l5
+            idx = np.array(idx1)
+            tot_bars_M1 = np.empty(0)
+            i=0
+            while i < 5:
+                new_b = percents[idx]
+                tot_bars_M1 = hstack((tot_bars_M1, 0, new_b))
+                idx = idx + 1
+                i=i+1
+            
+            # plot figure
+            fig_postfilt = res_plots + '\\fig_postfilt3M1.jpeg'
+            fig, ax = plt.subplots()  # M1
+            plt.bar(range(0, len(tot_bars_M1)), tot_bars_M1)
+
+            plt.xticks(range(0, len(tot_bars_M1)), all_names_M1, rotation=90, fontsize=10)
+            plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
+            plt.ylabel("Percent")
+            plt.ylim((0, 100))
+            plt.title("Percentage of filtered points per image pair M1")
+            plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
+            fig.savefig(fig_postfilt, bbox_inches='tight', dpi=dpi_value)  # , bbox_inches='tight', dpi=dpi_value
+            plt.clf()
 
         # For M2
         M2_list = [x for x in table_names2 if 'M2' in x]
-        new_l1 = [y for y in M2_list if list_win_size[0] in y]  # for each window_size, it selects all filter combinations
-        new_l2 = [y for y in M2_list if list_win_size[1] in y]
-        new_l3 = [y for y in M2_list if list_win_size[2] in y]
-        new_l4 = [y for y in M2_list if list_win_size[3] in y]
-        new_l5 = [y for y in M2_list if list_win_size[4] in y]
-        new_l1.sort(); new_l2.sort(); new_l3.sort(); new_l4.sort(); new_l5.sort();
+        if M2_list:
+            new_l1 = [y for y in M2_list if list_win_size[0] in y]  # for each window_size, it selects all filter combinations
+            new_l2 = [y for y in M2_list if list_win_size[1] in y]
+            new_l3 = [y for y in M2_list if list_win_size[2] in y]
+            new_l4 = [y for y in M2_list if list_win_size[3] in y]
+            new_l5 = [y for y in M2_list if list_win_size[4] in y]
+            new_l1.sort(); new_l2.sort(); new_l3.sort(); new_l4.sort(); new_l5.sort();
 
-        tpl1 = find_matching_index(new_l1, table_names2)
-        idx1 = [x[0] for x in tpl1]
+            tpl1 = find_matching_index(new_l1, table_names2)
+            idx1 = [x[0] for x in tpl1]
 
-        all_names_M2 = [""] + new_l1 + [""] + new_l2 + [""] + new_l3 + [""] + new_l4 + [""] + new_l5
-        idx = np.array(idx1)
-        tot_bars_M2 = np.empty(0)
-        i = 0
-        while i < 5:
-            new_b = percents[idx]
-            tot_bars_M2 = hstack((tot_bars_M2, 0, new_b))
-            idx = idx + 1
-            i = i + 1
+            all_names_M2 = [""] + new_l1 + [""] + new_l2 + [""] + new_l3 + [""] + new_l4 + [""] + new_l5
+            idx = np.array(idx1)
+            tot_bars_M2 = np.empty(0)
+            i = 0
+            while i < 5:
+                new_b = percents[idx]
+                tot_bars_M2 = hstack((tot_bars_M2, 0, new_b))
+                idx = idx + 1
+                i = i + 1
+
+            # plot
+            fig_postfilt = res_plots + '\\fig_postfilt3M2.jpeg'
+            fig, ax = plt.subplots()  # M2
+            plt.bar(range(0, len(tot_bars_M2)), tot_bars_M2)
+            plt.xticks(range(0, len(tot_bars_M2)), all_names_M2, rotation=90, fontsize=10)
+            plt.ylim((0, 100))
+            plt.ylabel("Percent")
+            plt.title("Percentage of filtered points per image pair M2")
+            plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
+            fig = plt.gcf()
+            fig.savefig(fig_postfilt, bbox_inches='tight', dpi=dpi_value)  # , bbox_inches='tight', dpi=dpi_value
+            plt.clf()
 
         # For M3
         M3_list = [x for x in table_names2 if 'M3' in x]
-        new_l1 = [y for y in M3_list if list_win_size[0] in y]  # for each window_size, it selects all filter combinations
-        new_l2 = [y for y in M3_list if list_win_size[1] in y]
-        new_l3 = [y for y in M3_list if list_win_size[2] in y]
-        new_l4 = [y for y in M3_list if list_win_size[3] in y]
-        new_l5 = [y for y in M3_list if list_win_size[4] in y]
-        new_l1.sort(); new_l2.sort(); new_l3.sort(); new_l4.sort(); new_l5.sort();
+        if M3_list:
+            new_l1 = [y for y in M3_list if list_win_size[0] in y]  # for each window_size, it selects all filter combinations
+            new_l2 = [y for y in M3_list if list_win_size[1] in y]
+            new_l3 = [y for y in M3_list if list_win_size[2] in y]
+            new_l4 = [y for y in M3_list if list_win_size[3] in y]
+            new_l5 = [y for y in M3_list if list_win_size[4] in y]
+            new_l1.sort(); new_l2.sort(); new_l3.sort(); new_l4.sort(); new_l5.sort();
 
-        tpl1 = find_matching_index(new_l1, table_names2)
-        idx1 = [x[0] for x in tpl1]
+            tpl1 = find_matching_index(new_l1, table_names2)
+            idx1 = [x[0] for x in tpl1]
 
-        all_names_M3 = [""] + new_l1 + [""] + new_l2 + [""] + new_l3 + [""] + new_l4 + [""] + new_l5
-        idx = np.array(idx1)
-        tot_bars_M3 = np.empty(0)
-        i = 0
-        while i < 5:
-            new_b = percents[idx]
-            tot_bars_M3 = hstack((tot_bars_M3, 0, new_b))
-            idx = idx + 1
-            i = i + 1
-
-        # plot figure
-        fig_postfilt = res_plots + '\\fig_postfilt3M1.jpeg'
-        fig, ax = plt.subplots()  # M1
-        plt.bar(range(0, len(tot_bars_M1)), tot_bars_M1)
-
-        plt.xticks(range(0, len(tot_bars_M1)), all_names_M1, rotation=90, fontsize=10)
-        plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
-        plt.ylabel("Percent")
-        plt.ylim((0, 100))
-        plt.title("Percentage of filtered points per image pair M1")
-        plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
-        fig.savefig(fig_postfilt, bbox_inches='tight', dpi=dpi_value)  # , bbox_inches='tight', dpi=dpi_value
-        plt.clf()
-        #---
-        fig_postfilt = res_plots + '\\fig_postfilt3M2.jpeg'
-        fig, ax = plt.subplots()  # M2
-        plt.bar(range(0, len(tot_bars_M2)), tot_bars_M2)
-        plt.xticks(range(0, len(tot_bars_M2)), all_names_M2, rotation=90, fontsize=10)
-        plt.ylim((0, 100))
-        plt.ylabel("Percent")
-        plt.title("Percentage of filtered points per image pair M2")
-        plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
-        fig = plt.gcf()
-        fig.savefig(fig_postfilt, bbox_inches='tight', dpi=dpi_value)  # , bbox_inches='tight', dpi=dpi_value
-        plt.clf()
-
-            # ---
-        fig_postfilt = res_plots + '\\fig_postfilt3M3.jpeg'
-        fig, ax = plt.subplots()  # M3
-        plt.bar(range(0, len(tot_bars_M3)), tot_bars_M3)
-        plt.xticks(range(0, len(tot_bars_M3)), all_names_M3, rotation=90, fontsize=10)
-        plt.ylim((0, 100))
-        plt.ylabel("Percent")
-        plt.title("Percentage of filtered points per image pair M3")
-        plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
-        fig = plt.gcf()
-        fig.savefig(fig_postfilt, bbox_inches='tight', dpi=dpi_value)  # , bbox_inches='tight', dpi=dpi_value
-        plt.clf()
+            all_names_M3 = [""] + new_l1 + [""] + new_l2 + [""] + new_l3 + [""] + new_l4 + [""] + new_l5
+            idx = np.array(idx1)
+            tot_bars_M3 = np.empty(0)
+            i = 0
+            while i < 5:
+                new_b = percents[idx]
+                tot_bars_M3 = hstack((tot_bars_M3, 0, new_b))
+                idx = idx + 1
+                i = i + 1
+            
+            # plot
+            fig_postfilt = res_plots + '\\fig_postfilt3M3.jpeg'
+            fig, ax = plt.subplots()  # M3
+            plt.bar(range(0, len(tot_bars_M3)), tot_bars_M3)
+            plt.xticks(range(0, len(tot_bars_M3)), all_names_M3, rotation=90, fontsize=10)
+            plt.ylim((0, 100))
+            plt.ylabel("Percent")
+            plt.title("Percentage of filtered points per image pair M3")
+            plt.gcf().subplots_adjust(bottom=0.3, right=0.9)
+            fig = plt.gcf()
+            fig.savefig(fig_postfilt, bbox_inches='tight', dpi=dpi_value)  # , bbox_inches='tight', dpi=dpi_value
+            plt.clf()
+        
 
     # end if window size == 5
 
