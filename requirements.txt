@@ -1,9 +1,6 @@
 nose
 sphinx
 
-#core
-#oggm
-
 #functions
 matplotlib
 scikit-image
