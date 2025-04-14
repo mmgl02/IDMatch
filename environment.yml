@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  - gdal=3.6.2=py313hff813ad_9
   - blas=1.0=mkl
   - blosc=1.21.3=h6c2663c_0
   - boost-cpp=1.82.0=h59b6b97_2
@@ -18,7 +19,6 @@ dependencies:
   - fonttools=4.55.3=py313h827c3e9_0
   - freetype=2.13.3=h0620614_0
   - freexl=2.0.0=hd7a5696_0
-  - gdal=3.6.2=py313hff813ad_9
   - geos=3.10.6=he74ecf9_0
   - geotiff=1.7.0=h4545760_3
   - glib=2.78.4=hd77b12b_0
