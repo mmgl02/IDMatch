@@ -1536,9 +1536,9 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
 
                     # Create SURF object and find keypoints and descriptors
                     hess_thres = 300  # Hessian Threshold (best between 300 and 500). The largest the values, the fewer the kp/des
-                    surf1 = cv2.SIFT_create( nfeatures=0, nOctaveLayers=4, contrastThreshold=0.005, edgeThreshold=10,  sigma=1.6) #we could change the values od the parameters. we set them as in D.Lowe paper. https://docs.opencv.org/3.4/d7/d60/classcv_1_1SIFT.html
+                    surf1 = cv2.SIFT_create( nfeatures=0, nOctaveLayers=3, contrastThreshold=0.04, edgeThreshold=10,  sigma=1.6) #we could change the values od the parameters. we set them as in D.Lowe paper. https://docs.opencv.org/3.4/d7/d60/classcv_1_1SIFT.html
                     kp1, des1 = surf1.detectAndCompute(template, None)
-                    surf2 = cv2.SIFT_create(nfeatures=0, nOctaveLayers=4, contrastThreshold=0.005, edgeThreshold=10,  sigma=1.6)
+                    surf2 = cv2.SIFT_create(nfeatures=0, nOctaveLayers=3, contrastThreshold=0.04, edgeThreshold=10,  sigma=1.6)
                     kp2, des2 = surf2.detectAndCompute(search_win, None)
 
                     # Match descriptor vectors using Brute Force
@@ -2248,7 +2248,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                 # if point 'p' is filtered, replace with median value of window
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    win_minus_p = np.delete(win_magn, stack_magn2D_pad[py, px])
+                    win_minus_p = np.delete(win_magn, int(stack_magn2D_pad[py, px]))
                     mean_magn_stack2[i] = np.nanmedian(win_minus_p)
                     stack_magn2D_pad[py, px] = np.nanmedian(win_minus_p)
                     filt_magn = filt_magn + 1
@@ -2300,7 +2300,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                 # if point 'p' is filtered, go see in mean_magn_stack
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    win_minus_p = np.delete(win_alpha, stack_angle2D_pad[py, px])
+                    win_minus_p = np.delete(win_alpha, int(stack_angle2D_pad[py, px]))
 
                     # Calculate mean angle of the window ('p' included)
                     win_alpha_sin_mean = np.nanmean(np.sin(np.radians(win_minus_p)))
