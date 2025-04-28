@@ -7,7 +7,7 @@
 # Mode 2: Two DSMs are matched
 # Mode 3: Two ortho-images and DSMs are matched (separately) and the results are merged together
 
-mode = 1
+mode = 2
 # --> Once your mode chosen, please fill all parameters related to your mode only (leave the others as they are) and fill the common parameters !!!
 
 #*** Run tests ***
@@ -35,8 +35,8 @@ img_filter_list = ['F1']#['F1', 'F2', 'F3', 'F1F2', 'F1F3']
 #--------------------------------------
 
 ###--- 1. Insert DSM file paths
-DSM1 = "C:\\\\Users\\Gindraux\\Documents\\IDMatch\\tests\\20160815_Gries_dsm_1m.tif"  # Path to the first digital surface model (DSM) (must be .tif)
-DSM2 = "C:\\Users\\Gindraux\\Documents\\IDMatch\\tests\\20160913_Gries_dsm_1m.tif"  # Path to the second digital surface model (DSM) (must be .tif)
+DSM1 = "C:\\Users\\moeag\\Documents\\IDMatch\\20160815_Gries_dsm_1m.tif" # Path to the first digital surface model (DSM) (must be .tif)
+DSM2 = "C:\\Users\\moeag\\Documents\\IDMatch\\20160913_Gries_dsm_1m.tif"   # Path to the second digital surface model (DSM) (must be .tif)
 
 ###--- 2. The DSMs will be used in two different ways. 1) as height model 2) as hillshade image. The filters for both type of data are therefore different and need to be separatedly specified
 
@@ -58,7 +58,7 @@ hil_filter_list = ['F1', 'F5', 'F1F5']
 # M1: Normalized Cross Correlation (NCC)
 # M2: Orientation Correlation (OC)
 # M3: Feature matching with SURF and Brute Force Matcher
-method_list = ['M1'] #['M1', 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
+method_list = ['M1', 'M2', 'M3']#['M1'] #  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
 
 pixel_dev = 6  # integer, estimated deviation or velocity (in pixel) between the input data pair. It will be used to define the window sizes in the matching function (matching)
 step_points = 25  # integer, in pixels

@@ -643,8 +643,8 @@ def import_datasets(image1, image2, dsm1, dsm2, res_input, res_plots, gl_extent,
 
     ## Re-import datasets
     # Re-import images
-    new_image1 = skimage.data.load(os.path.abspath(res_input + '\\i1.tif'))
-    new_image2 = skimage.data.load(os.path.abspath(res_input + '\\i2.tif'))
+    new_image1 = io.imread(os.path.abspath(res_input + '\\i1.tif'))
+    new_image2 = io.imread(os.path.abspath(res_input + '\\i2.tif'))
     new_img_geotransf = (intersection[0], cellsize, 0.0, intersection[1], 0.0, -cellsize)
 
     # Re-import DSMs
@@ -960,7 +960,7 @@ def prefilter_hil(hil_filter_list, res_input, mask_data):
     ## Apply the selected filters
     for hil in files_hil_list:
         for element in hil_filter_list:
-            hill = skimage.data.load(os.path.abspath(hil))
+            hill = io.imread(os.path.abspath(hil))
             if len(hill.shape) != 2: raise Exception('Your image ', hil, ' should be grayscale')
             count = 0
             if 'F1' in element:
@@ -1536,9 +1536,9 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
 
                     # Create SURF object and find keypoints and descriptors
                     hess_thres = 300  # Hessian Threshold (best between 300 and 500). The largest the values, the fewer the kp/des
-                    surf1 = cv2.SIFT_create( nfeatures=0, nOctaveLayers=3, contrastThreshold=0.04, edgeThreshold=10,  sigma=1.6) #we could change the values od the parameters. we set them as in D.Lowe paper. https://docs.opencv.org/3.4/d7/d60/classcv_1_1SIFT.html
+                    surf1 = cv2.SIFT_create() #we could change the values od the parameters. we set them as in D.Lowe paper. https://docs.opencv.org/3.4/d7/d60/classcv_1_1SIFT.html
                     kp1, des1 = surf1.detectAndCompute(template, None)
-                    surf2 = cv2.SIFT_create(nfeatures=0, nOctaveLayers=3, contrastThreshold=0.04, edgeThreshold=10,  sigma=1.6)
+                    surf2 = cv2.SIFT_create()
                     kp2, des2 = surf2.detectAndCompute(search_win, None)
 
                     # Match descriptor vectors using Brute Force
@@ -1992,7 +1992,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
             total_correct = (len(id_good[0])/ len(tot_match_pts[0])) *100 # 100 - ((len(id_good[0])/len(tot_match_pts[0])) * 100)
             total_filt_percent = 100 - total_correct
 
-        table_cols = np.array((len(tot_match_pts[0]), (pts_notmatch/len(tot_match_pts[0])) * 100, tot_matched * 100, total_filt_percent, total_correct, (filt_magn/tot_m) * 100, (filt_dir/tot_m) * 100, (filt_snr/tot_m) * 100, (filt_memb/tot_m) * 100, (filt_patch/tot_m) * 100)).reshape(10, 1)
+        table_cols = np.array((len(tot_match_pts[0]), (pts_notmatch/len(tot_match_pts[0])) * 100, tot_matched * 100, total_filt_percent, total_correct, (filt_magn/tot_m) * 100 if tot_m != 0 else 0, (filt_dir/tot_m) * 100 if tot_m != 0 else 0, (filt_snr/tot_m) * 100 if tot_m != 0 else 0, (filt_memb/tot_m) * 100 if tot_m != 0 else 0, (filt_patch/tot_m) * 100 if tot_m != 0 else 0)).reshape(10, 1)
         result_postfilt_table = np.column_stack((result_postfilt_table, table_cols))
 
 
