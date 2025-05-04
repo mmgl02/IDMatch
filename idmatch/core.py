@@ -62,10 +62,10 @@ if params.mode == 3:
     if params.img_filter_list != []: functions.prefilter_img(params.img_filter_list, result_inputdata, mask_input)
 
     # 2b. Pre-filter DSMs
-    if params.dsm_filter_list != []: functions.prefilter_dsm(result_inputdata, params.dsm_filter_list)
+    if params.dsm_filter_list != []: functions.prefilter_dsm( params.dsm_filter_list, result_inputdata)
 
     # 2c. Pre-filter Hillshades
-    if params.hil_filter_list != []: functions.prefilter_hil(result_inputdata, params.hil_filter_list, mask_input)
+    if params.hil_filter_list != []: functions.prefilter_hil( params.hil_filter_list,result_inputdata, mask_input)
 
 # 3. Match images/DSMs/Hillshades
 tot_matching_pts = functions.matching(result_inputdata, result_matching, params.method_list, mask_input, params.step_points, params.pixel_dev, params.nbr_windows, input_information)

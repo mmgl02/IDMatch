@@ -446,12 +446,15 @@ def import_dsm(dsm1, dsm2, res_input, res_plots, gl_extent, val_pts_option):
 
     ## Save also the hillshade DSM
     print("Saving hillshades")
+    ## Hillshades
     new_name1 = res_input + '\\H1.tif'
-    hillsh1 = ''.join(('gdaldem', ' ', 'hillshade', ' ',  dsm1, ' ', new_name1, ' ', '-of', ' ', 'GTiff'))
+    hillsh1 = ''.join(('gdaldem', ' ', 'hillshade', ' ', res_input + '\\D1.tif', ' ', new_name1, ' ', '-of', ' ', 'GTiff'))
     os.system(hillsh1)
+
     new_name2 = res_input + '\\H2.tif'
-    hillsh2 = ''.join(('gdaldem', ' ', 'hillshade', ' ',  dsm2, ' ', new_name2, ' ', '-of', ' ', 'GTiff'))
+    hillsh2 = ''.join(('gdaldem', ' ', 'hillshade', ' ', res_input + '\\D2.tif', ' ', new_name2, ' ', '-of', ' ', 'GTiff'))
     os.system(hillsh2)
+
 
     ## Re-import DSMs
     new_dsm1 = gdal.Open(res_input + '\\D1.tif', gdalconst.GA_ReadOnly)
@@ -635,10 +638,11 @@ def import_datasets(image1, image2, dsm1, dsm2, res_input, res_plots, gl_extent,
 
     ## Hillshades
     new_name1 = res_input + '\\H1.tif'
-    hillsh1 = ''.join(('gdaldem', ' ', 'hillshade', ' ', dsm1, ' ', new_name1, ' ', '-of', ' ', 'GTiff'))
+    hillsh1 = ''.join(('gdaldem', ' ', 'hillshade', ' ', res_input + '\\D1.tif', ' ', new_name1, ' ', '-of', ' ', 'GTiff'))
     os.system(hillsh1)
+
     new_name2 = res_input + '\\H2.tif'
-    hillsh2 = ''.join(('gdaldem', ' ', 'hillshade', ' ', dsm2, ' ', new_name2, ' ', '-of', ' ', 'GTiff'))
+    hillsh2 = ''.join(('gdaldem', ' ', 'hillshade', ' ', res_input + '\\D2.tif', ' ', new_name2, ' ', '-of', ' ', 'GTiff'))
     os.system(hillsh2)
 
     ## Re-import datasets
@@ -655,7 +659,7 @@ def import_datasets(image1, image2, dsm1, dsm2, res_input, res_plots, gl_extent,
 
     rows, cols = new_image1.shape[:2]  # new_image1 and new_image2, new_dsm1 and new_dsm2 have the same shape
     dataset_information = (intersection[0], cellsize, intersection[1], -cellsize, rows, cols, img1_proj)  # xOrigin, pixelWidth, yOrigin, pixelHeight, rows, cols, proj
-
+    print('rows,cols of new DSM:',rows, cols)
     # Store images in grayscale
     if len(new_image1.shape) == 2:  # Check whether the uploaded images are already grayscale
         image_gray1 = new_image1
@@ -738,7 +742,7 @@ def import_datasets(image1, image2, dsm1, dsm2, res_input, res_plots, gl_extent,
         # Create intersecting mask (mask = 1, otherwise 0) between both dsms
         c = new_dsm1_arr != dsm1_nodata
         c2 = new_dsm2_arr != dsm2_nodata
-
+        #print('shapes a,b,a2,b2,c,c2:',a.shape, b.shape, a2.shape, b2.shape, c.shape, c2.shape)
         # Intersect both masks
         mask_data = np.where((a == 1) & (b == 1) & (a2 == 1) & (b2 == 1) & (c == 1) & (c2 == 1), 1, 0)
 
@@ -949,8 +953,8 @@ def prefilter_hil(hil_filter_list, res_input, mask_data):
     print("## Pre-filtering hillshades")
 
     ## Import hillshades from input data folder
-    files_hil = os.listdir(res_input);
-    files_hil_list = [];
+    files_hil = os.listdir(res_input)
+    files_hil_list = []
     for file in files_hil:
         if file.endswith("tif"): pass
         else: raise Exception('The imported filed need to be .tif')
@@ -967,7 +971,7 @@ def prefilter_hil(hil_filter_list, res_input, mask_data):
                 count = count + counter[0]
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")  # to ignore: UserWarning: Possible precision loss when converting from float64 to uint16
-                    hill = skimage.filters.rank.median(hill, footprint=None, out=None, mask=mask_data, shift_x=False, shift_y=False)
+                    hill = skimage.filters.rank.median(hill, footprint=None, out=None, mask=mask_data, shift_x=0, shift_y=0)
             if 'F5' in element:
                 count = count + counter[1]
                 hill = skimage.filters.sobel(hill, mask=mask_data)  # alternative: skimage.feature.canny
@@ -982,6 +986,7 @@ def prefilter_hil(hil_filter_list, res_input, mask_data):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")  # to ignore: UserWarning: Possible precision loss when converting from float64 to uint8
                 skimage.io.imsave(new_name_hil, hill, plugin='pil')
+            print("end pre_filter hillshades")
 
     return
 
