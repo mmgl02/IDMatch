@@ -1782,14 +1782,14 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
                         magn_diff = np.abs(magn_neighbours - magnitude_pad[py, px])
-                        print('magnitude diff betw p and neighbours:', magn_diff)
+                        # print('magnitude diff betw p and neighbours:', magn_diff)
                         magn_idx = np.where(magn_diff <= magn_max)
                         nbr_similar_magn_neighbours = magn_neighbours[magn_idx]
 
                     # Calculate percentage of similar neighbours (neighbours that have a difference in magnitude smaller than magn_max)
                     try:
                         percent_sim_neighbours = len(nbr_similar_magn_neighbours) / len(magn_neighbours)
-                        print('perc sim neighbours', percent_sim_neighbours)
+                        # print('perc sim neighbours', percent_sim_neighbours)
                     except ZeroDivisionError:
                         percent_sim_neighbours = 0
 
@@ -1816,7 +1816,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                         warnings.simplefilter("ignore")
                         win_tan_mean = np.arctan2(win_alpha_sin_mean, win_alpha_cos_mean)  # in radians
                         win_angle_mean = np.degrees(win_tan_mean) % 360  # in angles (0-360°)
-                        print("win angle mean:", win_angle_mean)
+                        # print("win angle mean:", win_angle_mean)
                         # Calculate std of the window ('p' included)
                         abs_diff_2 = np.abs(((values_angle_wind_all - win_angle_mean) + 180) % 360 - 180)**2
                         win_angle_std = np.sqrt(np.nansum(abs_diff_2)/np.size(values_angle_wind_all))
