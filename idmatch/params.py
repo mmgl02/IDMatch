@@ -7,7 +7,7 @@
 # Mode 2: Two DSMs are matched
 # Mode 3: Two ortho-images and DSMs are matched (separately) and the results are merged together
 
-mode = 2
+mode = 1
 # --> Once your mode chosen, please fill all parameters related to your mode only (leave the others as they are) and fill the common parameters !!!
 
 #*** Run tests ***
@@ -20,23 +20,23 @@ mode = 2
 #--------------------------------------
 
 ###--- 1. Insert image file paths
-Image1 = r"tests\20160815_Gries_img_1m.tif" # Path to the first image (must be .tif)
-Image2 = r"tests\20160913_Gries_img_1m.tif" # Path to the second image (must be .tif)
+Image1 = r"C:\Users\marga\Documents\EPFL\Cours\S2\Design_project\Images\multi_band_2023-07-01.tif" # Path to the first image (must be .tif)
+Image2 = r"C:\Users\marga\Documents\EPFL\Cours\S2\Design_project\Images\multi_band_2024-07-01.tif"  # Path to the second image (must be .tif)
 
 ###--- 2a. The images can be pre-filtered (i.e. go through some noise filter or image enhancement). The user can define which ones to apply.
 # If you do not want your DSMs to be pre-filtered, leave the list empty (img_filter_list = []). The default is all possible combinations: img_filter_list = ['F1', 'F2', 'F3', 'F1F2', 'F1F3']
 # F1: Median filter
 # F2: Local histogram equalization
 # F3: Contrast Limited Adaptive Histogram Equalization (CLAHE).
-img_filter_list = ['F1']#, 'F2', 'F3', 'F1F2', 'F1F3']
+img_filter_list = ['F1F2']#, 'F2', 'F3', 'F1F2', 'F1F3']
 
 
 #------------ MODE 2 ------------------
 #--------------------------------------
 
 ###--- 1. Insert DSM file paths
-DSM1 = r"tests\20160815_Gries_dsm_1m\20160815_Gries_dsm_1m.tif"  # Path to the first digital surface model (DSM) (must be .tif)
-DSM2 = r"tests\20160913_Gries_dsm_1m\20160913_Gries_dsm_1m.tif"  # Path to the second digital surface model (DSM) (must be .tif)
+DSM1 = r"C:\Users\marga\Documents\EPFL\Cours\S2\Design_project\Images\multi_band_2003-07-01.tif" # Path to the first digital surface model (DSM) (must be .tif)
+DSM2 = r"C:\Users\marga\Documents\EPFL\Cours\S2\Design_project\Images\multi_band_2005-08-01.tif"  # Path to the second digital surface model (DSM) (must be .tif)
 
 ###--- 2. The DSMs will be used in two different ways. 1) as height model 2) as hillshade image. The filters for both type of data are therefore different and need to be separatedly specified
 
@@ -58,10 +58,10 @@ hil_filter_list = ['F1F5']#, 'F5', 'F1F5']
 # M1: Normalized Cross Correlation (NCC)
 # M2: Orientation Correlation (OC)
 # M3: Feature matching with SURF and Brute Force Matcher
-method_list = ['M1']#, 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
+method_list = ['M2']#, 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
 
 pixel_dev = 6  # integer, estimated deviation or velocity (in pixel) between the input data pair. It will be used to define the window sizes in the matching function (matching)
-step_points = 25  # integer, in pixels
+step_points = 3  # integer, in pixels
 nbr_windows = 5  # integer, number of different window sizes that will be used for the matching iterations.
 
 ###--- 4. Post-filtering
@@ -70,11 +70,11 @@ min_window_members = 15  # integer.
 
 ###--- 5. Others
 ##-- 5a. Do you have validation points of displacement? If yes, insert path to your .txt file. If not, leave empty (validation_pts_path = "")
-validation_pts_path = r"tests\stakes_gries.txt"  # The table need to have one line headers, with four columns x1, y1, x2, y2 (coordinates x and y at the first and second epoch), tab delimited.
+validation_pts_path = ''#r"tests\stakes_gries.txt"  # The table need to have one line headers, with four columns x1, y1, x2, y2 (coordinates x and y at the first and second epoch), tab delimited.
 
 
 ##-- 5b. Do you want to run IDMatch on a specific area of the image/dsm? If yes, insert path to your .txt file. If not, leave empty (gl_extent_path = "")
-gl_extent_path = r"tests\extent_gries.txt"  # The table need to have one line headers, with 2 columns x, y (coordinates of points delineating the object extent / area where the processing takes place), tab delimited.
+gl_extent_path = ''#r"tests\extent_gries.txt"  # The table need to have one line headers, with 2 columns x, y (coordinates of points delineating the object extent / area where the processing takes place), tab delimited.
 
 
 ##-- 5c. Set path where you want to save the software's outputs (results)

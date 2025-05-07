@@ -1537,10 +1537,10 @@ def matching(res_input, res_matching, method_list, mask_data, step_grid, pix_dev
                     search_win = img2_pad[pv_m[i] - hsearch_win: pv_m[i] + (hsearch_win + 1), pu_m[i] - hsearch_win: pu_m[i] + (hsearch_win + 1)]
 
                     # Pad template array
-                    template = np.pad(template, [(pix_dev,), (pix_dev,)], 'constant', constant_values=np.nan)
+                    template = np.pad(template, [(pix_dev,), (pix_dev,)], 'constant', constant_values=0)
 
                     # Create SURF object and find keypoints and descriptors
-                    hess_thres = 300  # Hessian Threshold (best between 300 and 500). The largest the values, the fewer the kp/des
+                    #hess_thres = 300  # Hessian Threshold (best between 300 and 500). The largest the values, the fewer the kp/des
                     surf1 = cv2.SIFT_create() #we could change the values od the parameters. we set them as in D.Lowe paper. https://docs.opencv.org/3.4/d7/d60/classcv_1_1SIFT.html
                     kp1, des1 = surf1.detectAndCompute(template, None)
                     surf2 = cv2.SIFT_create()
@@ -1782,12 +1782,14 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
                         magn_diff = np.abs(magn_neighbours - magnitude_pad[py, px])
+                        print('magnitude diff betw p and neighbours:', magn_diff)
                         magn_idx = np.where(magn_diff <= magn_max)
                         nbr_similar_magn_neighbours = magn_neighbours[magn_idx]
 
                     # Calculate percentage of similar neighbours (neighbours that have a difference in magnitude smaller than magn_max)
                     try:
                         percent_sim_neighbours = len(nbr_similar_magn_neighbours) / len(magn_neighbours)
+                        print('perc sim neighbours', percent_sim_neighbours)
                     except ZeroDivisionError:
                         percent_sim_neighbours = 0
 
@@ -1814,7 +1816,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                         warnings.simplefilter("ignore")
                         win_tan_mean = np.arctan2(win_alpha_sin_mean, win_alpha_cos_mean)  # in radians
                         win_angle_mean = np.degrees(win_tan_mean) % 360  # in angles (0-360°)
-
+                        print("win angle mean:", win_angle_mean)
                         # Calculate std of the window ('p' included)
                         abs_diff_2 = np.abs(((values_angle_wind_all - win_angle_mean) + 180) % 360 - 180)**2
                         win_angle_std = np.sqrt(np.nansum(abs_diff_2)/np.size(values_angle_wind_all))
@@ -1825,12 +1827,14 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
                         anglediff = np.abs(((alpha_neighbours - alpha_pad[py, px]) + 180) % 360 - 180)
+                        print('angle diff betw p and neighbors:', anglediff)
                         angle_idx = np.where(anglediff <= angle_max)
                         nbr_similar_alpha_neighbours = alpha_neighbours[angle_idx]
 
                     # Calculate percentage of similar neighbours (neighbours that have a difference in angle smaller than angle_max)
                     try:
                         percent_sim_neighbours = len(nbr_similar_alpha_neighbours) / len(alpha_neighbours)
+                        print('perc sim neighbours', percent_sim_neighbours)
                     except ZeroDivisionError:
                         percent_sim_neighbours = 0
 
