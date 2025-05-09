@@ -1827,14 +1827,12 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                     with warnings.catch_warnings():
                         warnings.simplefilter("ignore")
                         anglediff = np.abs(((alpha_neighbours - alpha_pad[py, px]) + 180) % 360 - 180)
-                        print('angle diff betw p and neighbors:', anglediff)
                         angle_idx = np.where(anglediff <= angle_max)
                         nbr_similar_alpha_neighbours = alpha_neighbours[angle_idx]
 
                     # Calculate percentage of similar neighbours (neighbours that have a difference in angle smaller than angle_max)
                     try:
                         percent_sim_neighbours = len(nbr_similar_alpha_neighbours) / len(alpha_neighbours)
-                        print('perc sim neighbours', percent_sim_neighbours)
                     except ZeroDivisionError:
                         percent_sim_neighbours = 0
 
@@ -1938,8 +1936,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
         pts_filtered = point_nokeep[y1, x1].flatten()
         id_good = np.where(pts_filtered == 0)  # indices in 1D
         id_good2D = np.where(point_nokeep == 0)  # indices in 2D
-        print(id_good)
-        print(id_good2D)
+
 
         magnitude_filt[id_good] = magn[id_good]  # magnitude array (from matching) filtered
         angle_filt[id_good] = angle[id_good]  # angle array (from matching) filtered
@@ -2444,7 +2441,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
         result_validation_table = np.column_stack((result_validation_table, match_magn, match_angle))
 
         # Fill validation result sorted combi
-        result_validation_table2 = np.row_stack((result_validation_table2, np.column_stack((RMSE_magn_val, RMSE_angle_val, R2_magn_val, R2_angle_val))))
+        result_validation_table2 = np.vstack((result_validation_table2, np.column_stack((RMSE_magn_val, RMSE_angle_val, R2_magn_val, R2_angle_val))))
 
 
         ##--- Save validation points for all tables ---
