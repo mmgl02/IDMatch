@@ -20,8 +20,8 @@ mode = 1
 #--------------------------------------
 
 ###--- 1. Insert image file paths
-Image1 = r"C:\Users\marga\Documents\EPFL\Cours\S2\Design_project\Images\multi_band_2023-07-01.tif" # Path to the first image (must be .tif)
-Image2 = r"C:\Users\marga\Documents\EPFL\Cours\S2\Design_project\Images\multi_band_2024-07-01.tif"  # Path to the second image (must be .tif)
+Image1 = r"tests\Aletsch\multi_band_2023-07-01.tif" # Path to the first image (must be .tif)
+Image2 = r"tests\Aletsch\\multi_band_2024-07-01.tif"  # Path to the second image (must be .tif)
 
 ###--- 2a. The images can be pre-filtered (i.e. go through some noise filter or image enhancement). The user can define which ones to apply.
 # If you do not want your DSMs to be pre-filtered, leave the list empty (img_filter_list = []). The default is all possible combinations: img_filter_list = ['F1', 'F2', 'F3', 'F1F2', 'F1F3']
@@ -58,7 +58,7 @@ hil_filter_list = ['F1F5']#, 'F5', 'F1F5']
 # M1: Normalized Cross Correlation (NCC)
 # M2: Orientation Correlation (OC)
 # M3: Feature matching with SURF and Brute Force Matcher
-method_list = ['M2']#, 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2', 'M3']
+method_list = ['M2']#, 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2']. M3 does not work.
 
 pixel_dev = 6  # integer, estimated deviation or velocity (in pixel) between the input data pair. It will be used to define the window sizes in the matching function (matching)
 step_points = 3  # integer, in pixels
