@@ -57,7 +57,7 @@ hil_filter_list = ['F1F5']#, 'F5', 'F1F5']
 ###--- 3. Chose the matching methods you want to apply on your dataset
 # M1: Normalized Cross Correlation (NCC)
 # M2: Orientation Correlation (OC)
-# M3: Feature matching with SURF and Brute Force Matcher
+# M3: Feature matching with SURF and Brute Force Matcher. It does not work yet.
 method_list = ['M2']#, 'M2', 'M3']  # it is possible to run IDMatch with individual methods. The default is: method_list = ['M1', 'M2']. M3 does not work.
 
 pixel_dev = 6  # integer, estimated deviation or velocity (in pixel) between the input data pair. It will be used to define the window sizes in the matching function (matching)

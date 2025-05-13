@@ -1,8 +1,8 @@
 This documentation was done in April 2025 by EPFL students for their design project.
 
 1. Open a terminal (Command Prompt in VS Code, or the one directly on your computer)
-2. Create a conda environment named env_idmatch with the requirements for using this code. Copy-paste the following command in your terminal:
-    conda env create --name env_idmatch --file environment.yml
+2. Create a conda environment named idmatch_env with the requirements for using this code. Copy-paste the following command in your terminal:
+    conda env create --file environment.yml
 3. Activate your environment: 
     conda activate idmatch_env
 4. Your environment is set; you can now run the code:
