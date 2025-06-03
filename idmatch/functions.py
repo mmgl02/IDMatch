@@ -2254,7 +2254,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                 # if point 'p' is filtered, replace with median value of window
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    win_minus_p = np.delete(win_magn, int(stack_magn2D_pad[py, px]))
+                    win_minus_p = np.delete(win_magn, int(stack_magn2D_pad[py, px])) # Error can be due to empty list of points, change parameters
                     mean_magn_stack2[i] = np.nanmedian(win_minus_p)
                     stack_magn2D_pad[py, px] = np.nanmedian(win_minus_p)
                     filt_magn = filt_magn + 1
@@ -2306,7 +2306,7 @@ def postfilter(val_pts_option, res_path, res_matching, res_postfilt, step_grid, 
                 # if point 'p' is filtered, go see in mean_magn_stack
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
-                    win_minus_p = np.delete(win_alpha, int(stack_angle2D_pad[py, px]))
+                    win_minus_p = np.delete(win_alpha, int(stack_angle2D_pad[py, px]))# Error can be due to empty list of points, change parameters
 
                     # Calculate mean angle of the window ('p' included)
                     win_alpha_sin_mean = np.nanmean(np.sin(np.radians(win_minus_p)))
